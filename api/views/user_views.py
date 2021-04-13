@@ -25,14 +25,17 @@ class SignUp(generics.CreateAPIView):
         if user.is_valid():
             # Actually create the user using the UserSerializer (the `create` method defined there)
             created_user = UserSerializer(data=user.data)
-
+            print(user.data['password'])
             if created_user.is_valid():
                 # Save the user and send back a response!
                 created_user.save()
+                print(created_user.data, "create-user-data")
                 return Response({ 'user': created_user.data }, status=status.HTTP_201_CREATED)
             else:
+                print(created_user.errors, "created errors")
                 return Response(created_user.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
+            print(user.errors, "errors")
             return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class SignIn(generics.CreateAPIView):
@@ -46,7 +49,7 @@ class SignIn(generics.CreateAPIView):
 
     def post(self, request):
         creds = request.data['credentials']
-        print(creds)
+        print(creds, "creds")
         # We can pass our email and password along with the request to the
         # `authenticate` method. If we had used the default user, we would need
         # to send the `username` instead of `email`.
