@@ -22,16 +22,21 @@ class Scans(generics.ListCreateAPIView):
     def get(self, request):
         """Index request"""
         print(request.user.is_superuser, "request")
-        if request.user.is_superuser:
-            all_scans = Scan.objects.all()
 
         scans = Scan.objects.filter(owner=request.user.id)
         if scans :
             print(scans, "my scans")
             data = ScanSerializer(scans, many=True).data
+
+        if request.user.is_superuser:
+            all_scans = Scan.objects.all()
             if all_scans :
                 all_data = ScanSerializer(all_scans, many=True).data
-                return Response({ 'scans': data, "all-scans": all_data})
+
+
+            return Response({ 'scans': data, "all-scans": all_data})
+
+        else:
             return Response({ 'scans': data })
 
 
