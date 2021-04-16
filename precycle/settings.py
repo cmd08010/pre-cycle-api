@@ -14,6 +14,7 @@ import os
 import sys
 import dj_database_url
 
+
 # .env config:
 from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
@@ -87,6 +88,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'precycle.urls'
