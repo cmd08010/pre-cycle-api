@@ -46,17 +46,19 @@ class Items(generics.ListCreateAPIView):
 
 class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes=(IsAuthenticated,)
-    def get(self, request, pk):
+    def get(self, request, slug):
         """Show request"""
         # Locate the item to show
-        item = get_object_or_404(Item, pk=pk)
-        # Only want to show owned items?
-        if not request.user.id == item.owner.id:
-            raise PermissionDenied('Unauthorized, you do not own this item')
+        print("my request:", request,  "my request", slug)
 
-        # Run the data through the serializer so it's formatted
+        item = get_object_or_404(Item, barcode=slug)
+        print(item, "the items")
+        if not item:
+            item = get_object_or_404(Item, name=slug)
+
         data = ItemSerializer(item).data
-        return Response({ 'item': data })
+        return Response({ 'items': [data] }, status=status.HTTP_201_CREATED)
+
 
     def delete(self, request, pk):
         """Delete request"""

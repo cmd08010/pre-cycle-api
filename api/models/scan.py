@@ -17,7 +17,7 @@ class Scan(models.Model):
 
     def __str__(self):
         # This must return a string
-        return f"The scan named '{self.name}' is {self.description}. It is {self.recycleable} that it is recycleable."
+        return f"The scan '{self.id}' named '{self.name}' is {self.description}. It is {self.recycleable} that it is recycleable."
 
     def as_dict(self):
         """Returns dictionary version of Scan models"""

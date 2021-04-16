@@ -17,8 +17,8 @@ class ItemSerializer(serializers.ModelSerializer):
 
 class UsersSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Item
-        fields = ('id', 'email')
+        model = User
+        fields = ('id', 'email', 'is_active', 'is_superuser')
 
 class UserSerializer(serializers.ModelSerializer):
     # This model serializer will be used for User creation
@@ -56,3 +56,11 @@ class ChangePasswordSerializer(serializers.Serializer):
     model = get_user_model()
     old = serializers.CharField(required=True)
     new = serializers.CharField(required=True)
+
+class ChangeUserActiveSerializer(serializers.Serializer):
+    model = get_user_model()
+    is_active = serializers.BooleanField(required=True)
+
+    def update(self, instance, validated_data):
+        instance.is_active = validated_data.get('is_active', instance.is_active)
+        return instance
