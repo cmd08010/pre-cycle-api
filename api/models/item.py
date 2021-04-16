@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 
 # Create your models here.
-class Data(models.Model):
+class Item(models.Model):
     """Make scan class"""
   # define fields
   # https://docs.djangoproject.com/en/3.0/ref/models/fields/
@@ -20,7 +20,7 @@ class Data(models.Model):
         return f"The scan named '{self.name}' is {self.description}. It is {self.recycleable} that it is recycleable."
 
     def as_dict(self):
-        """Returns dictionary version of Scan models"""
+        """Returns dictionary version of Item models"""
         return {
             'id': self.id,
             'name': self.name,

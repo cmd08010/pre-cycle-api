@@ -8,7 +8,8 @@ from django.contrib.auth import get_user, authenticate, login, logout
 from django.middleware.csrf import get_token
 
 from ..models.scan import Scan
-from ..serializers import ScanSerializer, UserSerializer
+from ..models.item import Item
+from ..serializers import ScanSerializer, UserSerializer, ItemSerializer
 
 # Create your views here.
 class Scans(generics.ListCreateAPIView):
@@ -16,31 +17,32 @@ class Scans(generics.ListCreateAPIView):
     serializer_class = ScanSerializer
     def get(self, request):
         """Index request"""
-        # Get all the scans:
-        # scans = Scan.objects.all()
-        # Filter the scans by owner, so you can only see your owned scans
-        print(request.user, "request user")
         scans = Scan.objects.filter(owner=request.user.id)
-        print(scans, "the scans")
-        # Run the data through the serializer
-        data = ScanSerializer(scans, many=True).data
-        return Response({ 'scans': data })
+        if scans :
+            print(scans, "my scans")
+            data = ScanSerializer(scans, many=True).data
+            return Response({ 'scans': data })
 
     def post(self, request):
         """Create request"""
         # Add user to request data object
         print(request.data, "request")
-        request.data['owner'] = request.user.id
-        # Serialize/create scan
-        scan = ScanSerializer(data=request.data)
-        # If the scan data is valid according to our serializer...
-        if scan.is_valid():
-            # Save the created scan & send a response
-            scan.save()
-            return Response({ 'scan': scan.data }, status=status.HTTP_201_CREATED)
+        print("my request:", request,  "my request", request.data)
+        items = Item.objects.filter(name=request.data['name'])
+        print(items)
+        if items :
+            print(items, "the items")
+            data = ItemSerializer(items, many=True).data
+            return Response({ 'items': data }, status=status.HTTP_201_CREATED)
+        else:
+            scans = Scan.objects.filter(name=request.data)
+            print(scans, "the scans")
+            # Run the data through the serializer
+            data = ScanSerializer(scans, many=True).data
+            return Response({ 'scans': data })
+            # return Response(data.errors, status=status.HTTP_400_BAD_REQUEST)
+
         # If the data is not valid, return a response with the errors
-        print(scan.errors, "scan errors")
-        return Response(scan.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ScanDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes=(IsAuthenticated,)

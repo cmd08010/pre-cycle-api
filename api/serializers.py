@@ -3,17 +3,22 @@ from rest_framework import serializers
 
 from .models.scan import Scan
 from .models.user import User
-from .models.data import Data
+from .models.item import Item
 
 class ScanSerializer(serializers.ModelSerializer):
     class Meta:
         model = Scan
         fields = ('id', 'name', 'recycleable', 'description', 'owner', 'barcode')
 
-class DataSerializer(serializers.ModelSerializer):
+class ItemSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Data
+        model = Item
         fields = ('id', 'name', 'recycleable', 'description', 'owner', 'barcode')
+
+class UsersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Item
+        fields = ('id', 'email')
 
 class UserSerializer(serializers.ModelSerializer):
     # This model serializer will be used for User creation
