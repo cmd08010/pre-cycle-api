@@ -20,7 +20,7 @@ class Scans(generics.ListCreateAPIView):
     permission_classes=(IsAuthenticated,)
     serializer_class = ScanSerializer
     def get(self, request):
-        """Index request"""
+        """get all scans for super user or just owner'sscans if not superuser"""
         print(request.user.is_superuser, "request")
 
         scans = Scan.objects.filter(owner=request.user.id)
@@ -32,7 +32,6 @@ class Scans(generics.ListCreateAPIView):
             all_scans = Scan.objects.all()
             if all_scans :
                 all_data = ScanSerializer(all_scans, many=True).data
-
 
             return Response({ 'scans': data, "all-scans": all_data})
 
@@ -86,12 +85,15 @@ class ScanDetail(generics.RetrieveUpdateDestroyAPIView):
         """Delete request"""
         # Locate scan to delete
         scan = get_object_or_404(Scan, pk=pk)
+        print(scan, "super", request.user.is_superuser)
         # Check the scan's owner agains the user making this request
-        if not request.user.id == scan.owner.id:
-            raise PermissionDenied('Unauthorized, you do not own this scan')
+        if request.user.is_superuser or request.user.id == scan.owner.id:
+            scan.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
         # Only delete if the user owns the  scan
-        scan.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            print(request.user.is_superuser)
+            raise PermissionDenied('Unauthorized, you do not own this scan')
 
     def partial_update(self, request, pk):
         """Update Request"""

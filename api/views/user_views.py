@@ -113,10 +113,10 @@ class Admin(generics.ListCreateAPIView):
     # Serializer classes are required for endpoints that create data
     serializer_class = UsersSerializer
     def get(self, request):
-        """Show request"""
+        """Get all the users for the admin"""
         # Locate the scan to show
 
-        get_users = User.objects.all()
+        get_users = User.objects.all().order_by('id')
         # Only want to show owned scans?
         if not request.user.is_superuser:
             raise PermissionDenied('Unauthorized, you are not an admin')
@@ -128,7 +128,7 @@ class Admin(generics.ListCreateAPIView):
 class AdminDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes=(IsAuthenticated,)
     def get(self, request, pk):
-        """Show request"""
+        """Get One users for the admin request"""
         # Locate the scan to show
         user = get_object_or_404(User, pk=pk)
         # Only want to show owned users?
@@ -151,7 +151,7 @@ class AdminDetail(generics.RetrieveUpdateDestroyAPIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def patch(self, request, pk):
-        """Update Request"""
+        """Update the is_active section for the User"""
         # Remove owner from request object
         # This "gets" the owner key on the data['user'] dictionary
         # and returns False if it doesn't find it. So, if it's found we

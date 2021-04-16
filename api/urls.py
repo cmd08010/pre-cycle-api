@@ -5,8 +5,7 @@ from .views.user_views import SignUp, SignIn, SignOut, ChangePassword, Admin, Ad
 
 urlpatterns = [
   	# Restful routing
-    path('add-item/', Items.as_view(), name='scans'),
-    path('get-items/', Items.as_view(), name='scans'),
+    path('items/', Items.as_view(), name='scans'),
     path('scans/', Scans.as_view(), name='scans'),
     path('get-item/', ItemDetail.as_view(), name='items'),
     path('scans/<int:pk>/', ScanDetail.as_view(), name='scan_detail'),
