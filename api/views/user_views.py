@@ -1,12 +1,13 @@
-# from rest_framework.views import APIView
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 from rest_framework import status, generics
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user, authenticate, login, logout
+from django.contrib import admin
 
-from ..serializers import UserSerializer, UserRegisterSerializer,  ChangePasswordSerializer
+from ..serializers import UserSerializer, UserRegisterSerializer, ChangePasswordSerializer, UsersSerializer, ChangeUserActiveSerializer
 from ..models.user import User
 
 class SignUp(generics.CreateAPIView):
@@ -65,7 +66,9 @@ class SignIn(generics.CreateAPIView):
                     'user': {
                         'id': user.id,
                         'email': user.email,
-                        'token': user.get_auth_token()
+                        'token': user.get_auth_token(),
+                        'is_superuser': user.is_superuser,
+                        'is_active': user.is_active
                     }
                 })
             else:
@@ -100,3 +103,66 @@ class ChangePassword(generics.UpdateAPIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class Admin(generics.ListCreateAPIView):
+    # Override the authentication/permissions classes so this endpoint
+    # is not authenticated & we don't need any permissions to access it.
+    permission_classes = (IsAuthenticated,)
+
+    # Serializer classes are required for endpoints that create data
+    serializer_class = UsersSerializer
+    def get(self, request):
+        """Show request"""
+        # Locate the scan to show
+
+        get_users = User.objects.all()
+        # Only want to show owned scans?
+        if not request.user.is_superuser:
+            raise PermissionDenied('Unauthorized, you are not an admin')
+
+        # Run the data through the serializer so it's formatted
+        users = UsersSerializer(get_users, many=True).data
+        return Response({ 'users': users })
+
+class AdminDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes=(IsAuthenticated,)
+    def get(self, request, pk):
+        """Show request"""
+        # Locate the scan to show
+        user = get_object_or_404(User, pk=pk)
+        # Only want to show owned users?
+        if not request.user.is_superuser:
+            raise PermissionDenied('Unauthorized, you are not an admin')
+
+        # Run the data through the serializer so it's formatted
+        data = User(user).data
+        return Response({ 'user': data })
+
+    def delete(self, request, pk):
+        """Delete request"""
+        # Locate user to delete
+        user = get_object_or_404(User, pk=pk)
+        # Check the user's owner agains the user making this request
+        if not request.user.id == user.owner.id:
+            raise PermissionDenied('Unauthorized, you do not own this user')
+        # Only delete if the user owns the  user
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def patch(self, request, pk):
+        """Update Request"""
+        # Remove owner from request object
+        # This "gets" the owner key on the data['user'] dictionary
+        # and returns False if it doesn't find it. So, if it's found we
+        # remove it.
+        if request.user.is_superuser:
+            user = get_object_or_404(User, pk=pk)
+            serializer = ChangeUserActiveSerializer(user, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.update(user, request.data)
+                user.save()
+                print(serializer)
+        # else:
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            # return Response("You are not an admin", status=status.HTTP_400_BAD_REQUEST)

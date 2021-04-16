@@ -1,13 +1,24 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from .models.mango import Mango
+from .models.scan import Scan
 from .models.user import User
+from .models.item import Item
 
-class MangoSerializer(serializers.ModelSerializer):
+class ScanSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Mango
-        fields = ('id', 'name', 'color', 'ripe', 'owner')
+        model = Scan
+        fields = ('id', 'name', 'recycleable', 'description', 'owner', 'barcode')
+
+class ItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Item
+        fields = ('id', 'name', 'recycleable', 'description', 'owner', 'barcode')
+
+class UsersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'email', 'is_active', 'is_superuser')
 
 class UserSerializer(serializers.ModelSerializer):
     # This model serializer will be used for User creation
@@ -45,3 +56,11 @@ class ChangePasswordSerializer(serializers.Serializer):
     model = get_user_model()
     old = serializers.CharField(required=True)
     new = serializers.CharField(required=True)
+
+class ChangeUserActiveSerializer(serializers.Serializer):
+    model = get_user_model()
+    is_active = serializers.BooleanField(required=True)
+
+    def update(self, instance, validated_data):
+        instance.is_active = validated_data.get('is_active', instance.is_active)
+        return instance
