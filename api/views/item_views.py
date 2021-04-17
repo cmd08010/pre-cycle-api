@@ -51,12 +51,16 @@ class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
         # Locate the item to show
         print("my request:", request,  "my request", slug)
 
-        item = get_object_or_404(Item, barcode=slug)
-        print(item, "the items")
+        item = Item.objects.filter(barcode=slug)
         if not item:
+            print("item was empty")
             item = get_object_or_404(Item, name=slug)
+            data = ItemGetSerializer(item).data
+            print(data, "my data")
+            return Response({ 'items': [data] }, status=status.HTTP_201_CREATED)
 
-        data = ItemGetSerializer(item).data
+        data = ItemGetSerializer(item[0]).data
+        print(data, "my data")
         return Response({ 'items': [data] }, status=status.HTTP_201_CREATED)
 
 
