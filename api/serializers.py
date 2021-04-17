@@ -6,6 +6,7 @@ from .models.user import User
 from .models.item import Item
 
 class ScanGetSerializer(serializers.ModelSerializer):
+    """serializer for get this includes the owners email"""
     owner = serializers.StringRelatedField()
     class Meta:
         model = Scan
