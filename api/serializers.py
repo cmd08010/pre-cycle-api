@@ -20,7 +20,7 @@ class ItemGetSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'recycleable', 'description', 'owner', 'barcode')
 
 class ScanSerializer(serializers.ModelSerializer):
-    # owner = serializers.StringRelatedField()
+    """serializer for posting """
     class Meta:
         model = Scan
         fields = ('id', 'name', 'recycleable', 'description', 'owner', 'barcode')
