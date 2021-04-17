@@ -13,6 +13,7 @@ class ScanGetSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'recycleable', 'description', 'owner', 'barcode')
 
 class ItemGetSerializer(serializers.ModelSerializer):
+    """serializer for get this includes the owners email"""
     owner = serializers.StringRelatedField()
     class Meta:
         model = Item
