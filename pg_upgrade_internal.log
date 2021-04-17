@@ -1,0 +1,7 @@
+
+-----------------------------------------------------------------
+  pg_upgrade run on Fri Apr 16 20:50:51 2021
+-----------------------------------------------------------------
+
+check for "/usr/local/Cellar/postgresql/9.0.4/bin" failed: No such file or directory
+
