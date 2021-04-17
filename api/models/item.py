@@ -20,7 +20,7 @@ class Item(models.Model):
         return f"The item named '{self.name}' is {self.description}. It is {self.recycleable} that it is recycleable."
 
     def as_dict(self):
-        """Returns dictionary version of Item models"""
+        """Returns dictionary version of Item models and stuff"""
         return {
             'id': self.id,
             'name': self.name,
