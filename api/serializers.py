@@ -5,14 +5,26 @@ from .models.scan import Scan
 from .models.user import User
 from .models.item import Item
 
-class ScanSerializer(serializers.ModelSerializer):
+class ScanGetSerializer(serializers.ModelSerializer):
     owner = serializers.StringRelatedField()
     class Meta:
         model = Scan
         fields = ('id', 'name', 'recycleable', 'description', 'owner', 'barcode')
 
-class ItemSerializer(serializers.ModelSerializer):
+class ItemGetSerializer(serializers.ModelSerializer):
     owner = serializers.StringRelatedField()
+    class Meta:
+        model = Item
+        fields = ('id', 'name', 'recycleable', 'description', 'owner', 'barcode')
+
+class ScanSerializer(serializers.ModelSerializer):
+    # owner = serializers.StringRelatedField()
+    class Meta:
+        model = Scan
+        fields = ('id', 'name', 'recycleable', 'description', 'owner', 'barcode')
+
+class ItemSerializer(serializers.ModelSerializer):
+    # owner = serializers.StringRelatedField()
     class Meta:
         model = Item
         fields = ('id', 'name', 'recycleable', 'description', 'owner', 'barcode')

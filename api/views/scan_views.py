@@ -13,7 +13,7 @@ from dotenv import load_dotenv, find_dotenv
 from ..models.scan import Scan
 from ..models.user import User
 from ..models.item import Item
-from ..serializers import ScanSerializer, UserSerializer, ItemSerializer
+from ..serializers import ScanSerializer, UserSerializer, ItemSerializer, ScanGetSerializer, ItemGetSerializer
 
 # Create your views here.
 class Scans(generics.ListCreateAPIView):
@@ -26,12 +26,12 @@ class Scans(generics.ListCreateAPIView):
         scans = Scan.objects.filter(owner=request.user.id)
         if scans :
             print(scans, "my scans")
-            data = ScanSerializer(scans, many=True).data
+            data = ScanGetSerializer(scans, many=True).data
 
         if request.user.is_superuser:
             all_scans = Scan.objects.all()
             if all_scans :
-                all_data = ScanSerializer(all_scans, many=True).data
+                all_data = ScanGetSerializer(all_scans, many=True).data
 
             return Response({ 'scans': data, "all-scans": all_data})
 
@@ -75,7 +75,7 @@ class ScanDetail(generics.RetrieveUpdateDestroyAPIView):
         # if not request.user.id == scan[0].owner.id:
         #     raise PermissionDenied('Unauthorized, you do not own this scan')
 
-        data = ItemSerializer(scan[0]).data
+        data = ItemGetSerializer(scan[0]).data
         print(data)
         return Response({ 'items': [data] })
 

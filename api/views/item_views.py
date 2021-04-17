@@ -8,7 +8,7 @@ from django.contrib.auth import get_user, authenticate, login, logout
 from django.middleware.csrf import get_token
 
 from ..models.item import Item
-from ..serializers import ItemSerializer, UserSerializer
+from ..serializers import ItemSerializer, UserSerializer, ItemGetSerializer
 
 # Create your views here.
 class Items(generics.ListCreateAPIView):
@@ -22,21 +22,21 @@ class Items(generics.ListCreateAPIView):
         print(request.user, "request user")
         items = Item.objects.all()
         # Run the data through the serializer
-        data = ItemSerializer(items, many=True).data
+        data = ItemGetSerializer(items, many=True).data
         print(data, "the data")
         return Response({ 'items': data })
 
     def post(self, request):
         """Create request"""
         # Add user to request data object
-        print(request.data, "request")
         # request.POST = request.POST.copy()
         request.data['owner'] = request.user.id
+        print(request.data['owner'], "request")
         # Serialize/create item
         item = ItemSerializer(data=request.data)
-        print(item, "item after serializer")
         # If the item data is valid according to our serializer...
         if item.is_valid():
+            print(item, "item after serializer", item.is_valid())
             # Save the created item & send a response
             item.save()
             return Response({ 'item': item.data }, status=status.HTTP_201_CREATED)
@@ -56,7 +56,7 @@ class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
         if not item:
             item = get_object_or_404(Item, name=slug)
 
-        data = ItemSerializer(item).data
+        data = ItemGetSerializer(item).data
         return Response({ 'items': [data] }, status=status.HTTP_201_CREATED)
 
 
