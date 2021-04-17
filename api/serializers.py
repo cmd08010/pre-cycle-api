@@ -4,6 +4,7 @@ from rest_framework import serializers
 from .models.scan import Scan
 from .models.user import User
 from .models.item import Item
+from .models.material import Material
 
 class ScanGetSerializer(serializers.ModelSerializer):
     """serializer for get this includes the owners email"""
@@ -24,6 +25,12 @@ class ScanSerializer(serializers.ModelSerializer):
     class Meta:
         model = Scan
         fields = ('id', 'name', 'recycleable', 'description', 'owner', 'barcode')
+
+class MaterialSerializer(serializers.ModelSerializer):
+    """serializer for posting """
+    class Meta:
+        model = Material
+        fields = ('id', 'name', 'recycleable')
 
 class ItemSerializer(serializers.ModelSerializer):
     # owner = serializers.StringRelatedField()
@@ -61,7 +68,6 @@ class UserRegisterSerializer(serializers.Serializer):
         # Ensure password & password_confirmation exist
         if not data['password'] or not data['password_confirmation']:
             raise serializers.ValidationError('Please include a password and password confirmation.')
-
         # Ensure password & password_confirmation match
         if data['password'] != data['password_confirmation']:
             raise serializers.ValidationError('Please make sure your passwords match.')

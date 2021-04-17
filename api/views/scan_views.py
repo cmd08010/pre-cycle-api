@@ -9,6 +9,9 @@ from django.contrib.auth import get_user, authenticate, login, logout
 from django.middleware.csrf import get_token
 import requests
 from dotenv import load_dotenv, find_dotenv
+import re
+from django.forms.models import model_to_dict
+import json
 
 from ..models.scan import Scan
 from ..models.user import User
@@ -25,7 +28,7 @@ class Scans(generics.ListCreateAPIView):
 
         scans = Scan.objects.filter(owner=request.user.id)
         if scans :
-            print(scans, "my scans")
+            print(type(scans), "my scans")
             data = ScanGetSerializer(scans, many=True).data
 
         if request.user.is_superuser:
@@ -132,11 +135,31 @@ class ScanApiDetail(generics.RetrieveUpdateDestroyAPIView):
 
         # Locate the scan to show
         response = requests.get(f"https://api.barcodelookup.com/v2/products?barcode={slug}&formatted=y&key={api_key}")
-        print(response)
         if response:
+            print(response, "my response")
             item = response.json()
+            for i in range(len(item)):
+                # loop through items and set to variable
+                descrip =  item['products'][i]['description']
+                name = item['products'][i]['product_name']
+                barcode = item['products'][i]['barcode_number']
+                recycleable = True
+                # use reg ex to find materials - will finish this later
+                x = re.search("^Material", descrip)
+                owner = request.user.id
+                data = Item(id, name, recycleable, descrip, owner, barcode)
+
+                print(type(data), "the data")
+                json_data = json.dumps(data)
+                print(json_data)
+                # # Serialize/create item
+                item = ItemSerializer(data=json_data)
+                # print(item, "scan after serializer")
+                # # If the scan data is valid according to our serializer...
+                if item.is_valid():
+                    print(item.data)
+                    # item.save()
             if item:
-                print(item)
                 return Response({'item': item}, status=status.HTTP_200_OK)
         else:
             errors = "No item found"

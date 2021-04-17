@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
+from .material import Material
+
 # Create your models here.
 class Scan(models.Model):
     """Make scan class"""
@@ -9,6 +11,10 @@ class Scan(models.Model):
     name = models.CharField(max_length=100)
     recycleable = models.BooleanField()
     description = models.CharField(max_length=100)
+    material = models.ForeignKey(
+        Material,
+        on_delete=models.CASCADE
+    )
     owner = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE
@@ -26,6 +32,7 @@ class Scan(models.Model):
             'name': self.name,
             'recycleable': self.recycleable,
             'description': self.description,
+            'material': self.material,
             'owner': self.owner,
             'barcode': self.barcode,
         }

@@ -8,6 +8,7 @@ from django.contrib.auth import get_user, authenticate, login, logout
 from django.middleware.csrf import get_token
 
 from ..models.item import Item
+from ..models.material import Material
 from ..serializers import ItemSerializer, UserSerializer, ItemGetSerializer
 
 # Create your views here.
