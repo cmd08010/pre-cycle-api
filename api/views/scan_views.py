@@ -138,22 +138,30 @@ class ScanApiDetail(generics.RetrieveUpdateDestroyAPIView):
         api_key = os.environ.get("API_KEY")
 
         # Locate the scan to show
-        response = requests.get(f"https://api.upcitemdb.com/prod/trial/lookup?upc={slug}")
+        # response = requests.get(f"https://api.upcitemdb.com/prod/trial/lookup?upc={slug}")
+        response = requests.get(f"https://api.barcodelookup.com/v2/products?barcode={slug}&formatted=y&key={api_key}")
         print(response)
-        # response = requests.get(f"https://api.barcodelookup.com/v2/products?barcode={slug}&formatted=y&key={api_key}")
         if response:
             item = response.json()
-            print(type(response), "the types ", type(item))
+            print(type(response), "the types ", type(item), item)
             data_list = []
             print(data_list, "datalist")
             # print(item['items'], "items")
-            for i in range(len(item['items'])):
+            # these are for the 100 limit api
+            # for i in range(len(item['items'])):
                 # loop through items and set to variable
-                data_list.append(item['items'][i]['description'])
-                data_list.append(name = item['items'][i]['title'])
-                data_list.append(barcode = item['items'][i]['upc'])
-                data_list.append(recycleable = True)
-                data_list.append(owner = request.user.id)
+                # data_list.append(item['items'][i]['description'])
+                # data_list.append(name = item['items'][i]['title'])
+                # data_list.append(barcode = item['items'][i]['upc'])
+                # data_list.append(recycleable = True)
+                # data_list.append(owner = request.user.id)
+            # this is for the api with 50 monthly limits
+            for i in range(len(item['products'])):
+                data_list.append(item['products'][i]['product_name'])
+                data_list.append(item['products'][i]['description'])
+                data_list.append(item['products'][i]['barcode_number'])
+                data_list.append(True)
+                data_list.append(request.user.id)
 
                 # use reg ex to find materials - will finish this later
                 # x = re.search("^Material", descrip)
@@ -172,16 +180,19 @@ class ScanApiDetail(generics.RetrieveUpdateDestroyAPIView):
                 # json_data = json.dumps(data)
 
                 # Serialize/create item
-                # item = ItemSerializer(data=data)
-        #         print(item, "scan after serializer")
-        #         # If the scan data is valid according to our serializer...
+                item = ItemSerializer(data=data_list)
+                print(item, "scan after serializer")
+                # If the scan data is valid according to our serializer...
 
-                # if item.is_valid():
-                #     print(item.data)
-                #     item.save()
-            # if data_list:
-        # else:
-            # errors = "No item found"
+                if item.is_valid():
+                    print(item.data)
+                    item.save()
+                else:
+                    print("not valid item")
 
-        # return Response("errors", status=status.HTTP_400_BAD_REQUEST)
-            return Response({'data': "data_list" }, status=status.HTTP_200_OK)
+            if data_list:
+                return Response({'data': data_list }, status=status.HTTP_200_OK)
+
+            else:
+                errors = "No item found"
+                return Response("errors", status=status.HTTP_400_BAD_REQUEST)

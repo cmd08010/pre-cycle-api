@@ -56,6 +56,22 @@ class Items(generics.ListCreateAPIView):
         item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+class ItemGetDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes=(IsAuthenticated,)
+    def get(self, request, pk):
+        """Show request"""
+        # Locate the item to show
+        print("my request:", request,  "my request", pk)
+
+        item = get_object_or_404(Item, pk=pk)
+
+        print(item)
+
+        data = ItemGetSerializer(item).data
+        print(data, "my data")
+        return Response({ 'items': [data] }, status=status.HTTP_201_CREATED)
+
+
 
 class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes=(IsAuthenticated,)
@@ -88,29 +104,40 @@ class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
         item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    def partial_update(self, request, pk):
+    def partial_update(self, request):
         """Update Request"""
         # Remove owner from request object
         # This "gets" the owner key on the data['item'] dictionary
         # and returns False if it doesn't find it. So, if it's found we
         # remove it.
-        if request.data['item'].get('owner', False):
-            del request.data['item']['owner']
+        p_k = request.data['id']
+        if request.data.get('owner', False):
+            del request.data['owner']
 
         # Locate Item
         # get_object_or_404 returns a object representation of our Item
-        item = get_object_or_404(Item, pk=pk)
+        item = get_object_or_404(Item, pk=p_k)
+        material = get_object_or_404(Material, name=request.data['material'])
+        request.data['material'] = material.id
         # Check if user is the same as the request.user.id
-        if not request.user.id == item.owner.id:
+        if not request.user.is_superuser or not request.user.id == item.owner.id :
             raise PermissionDenied('Unauthorized, you do not own this item')
 
         # Add owner to data object now that we know this user owns the resource
-        request.data['item']['owner'] = request.user.id
+        request.data['owner'] = request.user.id
+
+        print(type(item), item, "my item was found")
+
+        if not request.data['owner']:
+            print("no")
         # Validate updates with serializer
-        data = ItemSerializer(item, data=request.data['item'])
+        data = ItemSerializer(item, data=request.data, partial=True)
+
         if data.is_valid():
             # Save & send a 204 no content
+            print(data, "is valid")
             data.save()
             return Response(status=status.HTTP_204_NO_CONTENT)
         # If the data is not valid, return a response with the errors
+        print(data.errors)
         return Response(data.errors, status=status.HTTP_400_BAD_REQUEST)

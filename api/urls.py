@@ -1,16 +1,17 @@
 from django.urls import path
 from .views.scan_views import Scans, ScanDetail, ScanApiDetail
-from .views.item_views import Items, ItemDetail
+from .views.item_views import Items, ItemDetail, ItemGetDetail
 from .views.material_views import Materials
 from .views.user_views import SignUp, SignIn, SignOut, ChangePassword, Admin, AdminDetail
 
 urlpatterns = [
   	# Restful routing
     path('items/', Items.as_view(), name='items'),
+    path('update-item/', ItemDetail.as_view(), name='items'),
     path('items/<int:pk>', Items.as_view(), name='items'),
     path('scans/', Scans.as_view(), name='scans'),
     path('materials/', Materials.as_view(), name='materials'),
-    path('get-item/', ItemDetail.as_view(), name='items'),
+    path('item/<int:pk>', ItemGetDetail.as_view(), name='items'),
     path('scans/<int:pk>/', ScanDetail.as_view(), name='scan_detail'),
     path('scan-item/<str:slug>/', ItemDetail.as_view(), name='scan_detail'),
     path('scan-item/<str:slug>/api/', ScanApiDetail.as_view(), name='scan_detail'),
