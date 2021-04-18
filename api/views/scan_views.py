@@ -16,6 +16,7 @@ import json
 from ..models.scan import Scan
 from ..models.user import User
 from ..models.item import Item
+from ..models.material import Material
 from ..serializers import ScanSerializer, UserSerializer, ItemSerializer, ScanGetSerializer, ItemGetSerializer
 
 # Create your views here.
@@ -45,14 +46,16 @@ class Scans(generics.ListCreateAPIView):
     def post(self, request):
         """Create request"""
         # Add user to request data object
-        print(request.user, "request")
         # request.POST = request.POST.copy()
         request.data[0]['owner'] = request.user.id
+        # print(request.data[0]['material'])
+        material = Material.objects.get(name=request.data[0]['material'])
+        print(material.id)
+        request.data[0]['material'] = material.id
         # # Serialize/create item
-        print('dict', type(request.data[0]), request.data)
         scan = ScanSerializer(data=request.data[0])
-        print(scan, "scan after serializer")
         # # If the scan data is valid according to our serializer...
+        print(scan, "scan after serializer")
         if scan.is_valid():
             scan.save()
             return Response({ 'scan': scan.data }, status=status.HTTP_201_CREATED)

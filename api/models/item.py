@@ -22,6 +22,8 @@ class Item(models.Model):
         on_delete=models.CASCADE
     )
     barcode = models.CharField(max_length=100, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     # def toJson(self):
     #     return json.dumps(self, default=lambda o: o.json_serialize())

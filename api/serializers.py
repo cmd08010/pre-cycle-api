@@ -11,20 +11,21 @@ class ScanGetSerializer(serializers.ModelSerializer):
     owner = serializers.StringRelatedField()
     class Meta:
         model = Scan
-        fields = ('id', 'name', 'recycleable', 'description', 'material', 'owner', 'barcode')
+        fields = ('id', 'name', 'recycleable', 'description', 'material', 'owner', 'barcode', 'created_at', 'updated_at')
 
 class ItemGetSerializer(serializers.ModelSerializer):
     """serializer for get this includes the owners email"""
     owner = serializers.StringRelatedField()
+    material = serializers.StringRelatedField()
     class Meta:
         model = Item
-        fields = ('id', 'name', 'recycleable', 'description', 'material', 'owner', 'barcode')
+        fields = ('id', 'name', 'recycleable', 'description', 'material', 'owner', 'barcode', 'created_at', 'updated_at')
 
 class ScanSerializer(serializers.ModelSerializer):
     """serializer for posting """
     class Meta:
         model = Scan
-        fields = ('id', 'name', 'recycleable', 'description', 'material', 'owner', 'barcode')
+        fields = ('id', 'name', 'recycleable', 'description', 'material', 'owner', 'barcode', 'created_at', 'updated_at')
 
 class MaterialSerializer(serializers.ModelSerializer):
     """serializer for posting """
@@ -35,7 +36,7 @@ class MaterialSerializer(serializers.ModelSerializer):
 class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
-        fields = ('id', 'name', 'recycleable', 'description', 'material', 'owner', 'barcode')
+        fields = ('id', 'name', 'recycleable', 'description', 'material', 'owner', 'barcode', 'created_at', 'updated_at')
 
 class UsersSerializer(serializers.ModelSerializer):
     class Meta:
