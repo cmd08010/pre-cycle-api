@@ -126,8 +126,6 @@ class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
         # Add owner to data object now that we know this user owns the resource
         request.data['owner'] = request.user.id
 
-        print(type(item), item, "my item was found")
-
         if not request.data['owner']:
             print("no")
         # Validate updates with serializer
