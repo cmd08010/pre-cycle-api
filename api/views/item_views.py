@@ -32,7 +32,7 @@ class Items(generics.ListCreateAPIView):
         # Add user to request data object
         # request.POST = request.POST.copy()
         request.data['owner'] = request.user.id
-        print(request.data['owner'], "request")
+        print(request.data, "request")
         # Serialize/create item
         item = ItemSerializer(data=request.data)
         # If the item data is valid according to our serializer...

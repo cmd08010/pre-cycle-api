@@ -49,6 +49,7 @@ class Scans(generics.ListCreateAPIView):
         # request.POST = request.POST.copy()
         request.data[0]['owner'] = request.user.id
         # # Serialize/create item
+        print('dict', type(request.data[0]), request.data)
         scan = ScanSerializer(data=request.data[0])
         print(scan, "scan after serializer")
         # # If the scan data is valid according to our serializer...
@@ -134,34 +135,51 @@ class ScanApiDetail(generics.RetrieveUpdateDestroyAPIView):
         api_key = os.environ.get("API_KEY")
 
         # Locate the scan to show
-        response = requests.get(f"https://api.barcodelookup.com/v2/products?barcode={slug}&formatted=y&key={api_key}")
+        response = requests.get(f"https://api.upcitemdb.com/prod/trial/lookup?upc={slug}")
+        # response = requests.get(f"https://api.barcodelookup.com/v2/products?barcode={slug}&formatted=y&key={api_key}")
         if response:
-            print(response, "my response")
             item = response.json()
-            for i in range(len(item)):
+            print(type(response), "the types ", type(item))
+            # print(item['items'], "items")
+            for i in range(len(item['items'])):
                 # loop through items and set to variable
-                descrip =  item['products'][i]['description']
-                name = item['products'][i]['product_name']
-                barcode = item['products'][i]['barcode_number']
+                descrip =  item['items'][i]['description']
+                print(descrip, type(descrip))
+                name = item['items'][i]['title']
+                print(name, type(name))
+                barcode = item['items'][i]['upc']
+                print(barcode, type(barcode))
                 recycleable = True
+                print(recycleable, type(recycleable))
+
                 # use reg ex to find materials - will finish this later
                 x = re.search("^Material", descrip)
                 owner = request.user.id
-                data = Item(id, name, recycleable, descrip, owner, barcode)
+                data = {"id": id,
+                        "name": name,
+                        "recycleable": recycleable,
+                        "description": descrip,
+                        "owner": owner,
+                        "barcode": barcode}
+                # data_loads = json.loads(data)
+                print(type(data), "the data", data)
+                #
+                data_json = json.dumps(data, indent=4)
+                print(data_json, "the json")
 
-                print(type(data), "the data")
-                json_data = json.dumps(data)
-                print(json_data)
+                # json_data = json.dumps(data)
+        #
                 # # Serialize/create item
-                item = ItemSerializer(data=json_data)
-                # print(item, "scan after serializer")
-                # # If the scan data is valid according to our serializer...
-                if item.is_valid():
-                    print(item.data)
-                    # item.save()
-            if item:
-                return Response({'item': item}, status=status.HTTP_200_OK)
-        else:
-            errors = "No item found"
+        #         item = ItemSerializer(data=data_json)
+        # #         print(item, "scan after serializer")
+        # #         # If the scan data is valid according to our serializer...
+        #         print(item, "item")
+        #         if item.is_valid():
+        #             print(item.data)
+        #             item.save()
+        #     if item:
+        #         return Response({'item': item}, status=status.HTTP_200_OK)
+        # # else:
+        #     errors = "No item found"
 
-        return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response("errors", status=status.HTTP_400_BAD_REQUEST)
