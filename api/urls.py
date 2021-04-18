@@ -19,5 +19,5 @@ urlpatterns = [
     path('sign-out/', SignOut.as_view(), name='sign-out'),
     path('users/<int:pk>/', AdminDetail.as_view(), name='admin'),
     path('users/', Admin.as_view(), name='admin'),
-    path('change-pw/', ChangePassword.as_view(), name='change-pw')
+    path('change-password/', ChangePassword.as_view(), name='change-pw')
 ]
