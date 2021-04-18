@@ -45,6 +45,18 @@ class Items(generics.ListCreateAPIView):
         print(item.errors, "item errors")
         return Response(item.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request, pk):
+        """Delete request"""
+        # Locate item to delete
+        item = get_object_or_404(Item, pk=pk)
+        # Check the item's owner agains the user making this request
+        if not request.user.id == item.owner.id:
+            raise PermissionDenied('Unauthorized, you do not own this item')
+        # Only delete if the user owns the  item
+        item.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes=(IsAuthenticated,)
     def get(self, request, slug):
