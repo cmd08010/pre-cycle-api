@@ -24,6 +24,9 @@ class Scan(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def to_json(self):
+        return {'data': self.data}
+
     def __str__(self):
         # This must return a string
         return f"The scan '{self.id}' named '{self.name}' is {self.description}. It is {self.recycleable} that it is recycleable."
