@@ -170,14 +170,15 @@ class ScanApiDetail(generics.RetrieveUpdateDestroyAPIView):
                 if 'Material' or 'Materials' in data_list[1]:
                     mystring = data_list[1]
                     after_keyword = mystring.partition('Material:')
-                    mat_keyword = after_keyword[2].split()[0]
-                    print(mat_keyword, "my material")
-                    mat = Material.objects.filter(name=mat_keyword)
-                    if mat:
-                        print(mat[0].recycleable)
-                        data_list[3] = mat[0].recycleable
-                    else:
-                        data_list[3] = False
+                    print(after_keyword, "my material")
+                    if (after_keyword[2]): 
+                        mat_keyword = after_keyword[2].split()[0]
+                        mat = Material.objects.filter(name=mat_keyword)
+                        if mat:
+                            print(mat[0].recycleable)
+                            data_list[3] = mat[0].recycleable
+                        else:
+                            data_list[3] = False
 
                 # data = {"id": id,
                 #         "name": name,
