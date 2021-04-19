@@ -26,7 +26,6 @@ class SignUp(generics.CreateAPIView):
         if user.is_valid():
             # Actually create the user using the UserSerializer (the `create` method defined there)
             created_user = UserSerializer(data=user.data)
-            print(user.data['password'])
             if created_user.is_valid():
                 # Save the user and send back a response!
                 created_user.save()
@@ -36,7 +35,7 @@ class SignUp(generics.CreateAPIView):
                 print(created_user.errors, "created errors")
                 return Response(created_user.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
-            print(user.errors, "errors")
+            print(user.errors[0], "errors")
             return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class SignIn(generics.CreateAPIView):

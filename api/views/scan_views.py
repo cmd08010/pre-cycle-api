@@ -27,6 +27,7 @@ class Scans(generics.ListCreateAPIView):
         """get all scans for super user or just owner'sscans if not superuser"""
         print(request.user.is_superuser, "request")
 
+
         scans = Scan.objects.filter(owner=request.user.id)
         if scans :
             print(type(scans), "my scans")
@@ -81,7 +82,8 @@ class ScanDetail(generics.RetrieveUpdateDestroyAPIView):
         # # Only want to show owned scans?
         # if not request.user.id == scan[0].owner.id:
         #     raise PermissionDenied('Unauthorized, you do not own this scan')
-
+        x = re.search("^Material:", scan.description)
+        print(x)
         data = ItemGetSerializer(scan[0]).data
         print(data)
         return Response({ 'items': [data] })
@@ -164,8 +166,19 @@ class ScanApiDetail(generics.RetrieveUpdateDestroyAPIView):
                 data_list.append(request.user.id)
 
                 # use reg ex to find materials - will finish this later
-                # x = re.search("^Material", descrip)
                 print(data_list, "datalist")
+                if 'Material' or 'Materials' in data_list[1]:
+                    mystring = data_list[1]
+                    after_keyword = mystring.partition('Material:')
+                    mat_keyword = after_keyword[2].split()[0]
+                    print(mat_keyword, "my material")
+                    mat = Material.objects.filter(name=mat_keyword)
+                    if mat:
+                        print(mat[0].recycleable)
+                        data_list[3] = mat[0].recycleable
+                    else:
+                        data_list[3] = False
+
                 # data = {"id": id,
                 #         "name": name,
                 #         "recycleable": recycleable,
@@ -181,7 +194,7 @@ class ScanApiDetail(generics.RetrieveUpdateDestroyAPIView):
 
                 # Serialize/create item
                 item = ItemSerializer(data=data_list)
-                print(item, "scan after serializer")
+                # print(item, "scan after serializer")
                 # If the scan data is valid according to our serializer...
 
                 if item.is_valid():

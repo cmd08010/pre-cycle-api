@@ -6,6 +6,7 @@ from rest_framework import generics, status
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user, authenticate, login, logout
 from django.middleware.csrf import get_token
+import re
 
 from ..models.item import Item
 from ..models.material import Material
@@ -78,9 +79,23 @@ class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
     def get(self, request, slug):
         """Show request"""
         # Locate the item to show
-        print("my request:", request,  "my request", slug)
 
         item = Item.objects.filter(barcode=slug)
+        # print("my request:", item[0],  "my request", slug)
+
+        # if 'Material' in item[0].description:
+        #     mystring = item[0].description
+        #     after_keyword = mystring.partition('Material: -')
+        #     mat_keyword = after_keyword[2].split()[0]
+        #     print(mat_keyword, "my material")
+        #     mat = Material.objects.filter(name=mat_keyword)
+        #     if mat:
+        #         print(mat[0].recycleable)
+        #         item[0].recycleable = mat[0].recycleable
+        #     else:
+        #         item[0].recycleable
+
+        # //print(x)
         if not item:
             print("item was empty")
             item = get_object_or_404(Item, name=slug)

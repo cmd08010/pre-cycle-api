@@ -12,7 +12,7 @@ class Item(models.Model):
   # https://docs.djangoproject.com/en/3.0/ref/models/fields/
     name = models.CharField(max_length=100, unique=True)
     recycleable = models.BooleanField()
-    description = models.CharField(max_length=100)
+    description = models.CharField(max_length=1000)
     material = models.ForeignKey(
         Material,
         on_delete=models.CASCADE
