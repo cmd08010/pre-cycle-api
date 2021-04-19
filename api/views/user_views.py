@@ -161,7 +161,8 @@ class AdminDetail(generics.RetrieveUpdateDestroyAPIView):
             if serializer.is_valid():
                 serializer.update(user, request.data)
                 user.save()
-                print(serializer)
+                get_users = User.objects.all().order_by('id')
+                users = UsersSerializer(get_users, many=True).data
         # else:
-                return Response(status=status.HTTP_204_NO_CONTENT)
+                return Response({'users': users }, status=status.HTTP_200_OK)
             # return Response("You are not an admin", status=status.HTTP_400_BAD_REQUEST)
